@@ -78,6 +78,57 @@ class FundAPI:
             return render_template('AddNewFunds.html')
         
         
+        @self.app.route('/update/<fund_id>', methods=['GET'])
+        def render_update_page(fund_id):
+            try:
+                # Fetch fund information from the database
+                equity_funds = self.equity_manager.get_all_funds()
+                fund_to_update = next((fund for fund in equity_funds if fund["fund_id"] == fund_id), None)
+
+                if not fund_to_update:
+                    return jsonify({"error": "Fund not found"}), 404
+
+                return render_template('update_fund_form.html', fund=fund_to_update)
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+
+        @self.app.route('/funds/<fund_id>', methods=['POST'])
+        def put_fund(fund_id):
+            """
+            Endpoint to update a fund's information using form submission.
+            """
+            try:
+                # Parse the form data
+                fund_data = request.form.to_dict()
+
+                # Validate and process numeric fields
+                fund_data['nav'] = float(fund_data.get('nav', 0))
+                fund_data['performance'] = float(fund_data.get('performance', 0))
+                
+                # Update the fund using the manager
+                result = self.equity_manager.update_fund(fund_id, fund_data)
+                
+                if "error" in result:
+                    return jsonify({"error": result["error"]}), 400
+                
+                return """
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Success</title>
+                </head>
+                <body>
+                    <h1>Upadate fund successfully.</h1>
+                    <a href="/funds">Back to Funds List</a>
+                </body>
+                </html>
+                """
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+
+
 
         #Home page
         @self.app.route('/')

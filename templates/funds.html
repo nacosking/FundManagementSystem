@@ -6,8 +6,7 @@
     <title>Funds</title>
 </head>
 <body>
-    <h1>List of Equity Funds</h1>
-    <button><a href="/addfunds">Add New Fund</a></button>
+    <h1>Equity Funds</h1>
     <form action="/funds" method="GET">
         <label for="search">Search Funds by Name:</label>
         <input type="text" name="search" id="search" placeholder="Enter fund name...">
@@ -28,6 +27,9 @@
                 {% for value in fund.values() %}
                     <td>{{ value }}</td>
                 {% endfor %}
+                <td>
+                    <button onclick="window.location.href='/update/{{ fund.fund_id }}'">Update</button>
+                </td>
             </tr>
         {% endfor %}
     </table>

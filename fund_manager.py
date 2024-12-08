@@ -21,8 +21,34 @@ class FundManager:
             cursor = conn.cursor()
             cursor.execute(create_table_query)
             conn.commit()
+    
+    def update_fund(self, fund_id, fund_data):
+        try:
+            with self.db.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    UPDATE funds 
+                    SET name = ?, manager_name = ?, description = ?, nav = ?, creation_date = ?, performance = ?
+                    WHERE fund_id = ?
+                """, (
+                    fund_data['name'],
+                    fund_data['manager_name'],
+                    fund_data['description'],
+                    fund_data['nav'],
+                    fund_data['creation_date'],
+                    fund_data['performance'],
+                    fund_id,
+                ))
+                conn.commit()
+                if cursor.rowcount == 0:
+                    return {"error": "No fund with given ID"}
+                return {"message": "Fund successfully updated."}
+        except Exception as e:
+            return {"error": str(e)}
 
-    def create_fund(self, fund_data):
+
+
+    def create_fund(self, fund_data, funds_id):
         required_fields = ["fund_id", "name", "manager_name", "description", "nav", "creation_date", "performance"]
         
         # Validate input data

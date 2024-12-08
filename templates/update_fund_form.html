@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Fund</title>
+</head>
+<body>
+    <h1>Update Fund</h1>
+    <form action="/funds/{{ fund.fund_id }}" method="POST">
+        <label for="name">Fund Name:</label>
+        <input type="text" id="name" name="name" value="{{ fund.name }}" required><br><br>
+        
+        <label for="manager_name">Manager Name:</label>
+        <input type="text" id="manager_name" name="manager_name" value="{{ fund.manager_name }}" required><br><br>
+        
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" value="{{ fund.description }}"><br><br>
+        
+        <label for="nav">NAV:</label>
+        <input type="number" id="nav" name="nav" value="{{ fund.nav }}" step="0.01" required><br><br>
+        
+        <label for="creation_date">Creation Date:</label>
+        <input type="date" id="creation_date" name="creation_date" value="{{ fund.creation_date }}" required><br><br>
+        
+        <label for="performance">Performance:</label>
+        <input type="number" id="performance" name="performance" value="{{ fund.performance }}" step="0.01"><br><br>
+        
+        <button type="submit">Update Fund</button>
+    </form>
+</body>
+</html>
