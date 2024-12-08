@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funds</title>
+</head>
+<body>
+    <h1>List of Equity Funds</h1>
+    <table border="1" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            {% if equity_funds %}
+                {% for key in equity_funds[0].keys() %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            {% else %}
+                <th>No Data Available</th>
+            {% endif %}
+        </tr>
+        {% for fund in equity_funds %}
+            <tr>
+                {% for value in fund.values() %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

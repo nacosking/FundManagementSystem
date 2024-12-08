@@ -51,7 +51,20 @@ class FundManager:
             cursor.execute(query, values)
             conn.commit()
 
-
+    def get_all_funds(self):
+        query = "SELECT * FROM funds"
+        with self.db.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            
+            # Dynamically map column names to rows
+            column_names = [description[0] for description in cursor.description]  # Get column names dynamically
+            rows = cursor.fetchall()
+            
+            # Map rows into a list of dictionaries
+            funds = [dict(zip(column_names, row)) for row in rows]
+            
+            return funds
 
 class EquityFundManager(FundManager):
     def __init__(self, db_handler):
