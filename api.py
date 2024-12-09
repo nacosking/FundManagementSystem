@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect
+from flask import Flask, request, jsonify, render_template
 from DatabaseConnection import DatabaseHandler
 from fund_manager import EquityFundManager
 
@@ -88,91 +88,43 @@ class FundAPI:
                 if not fund_to_update:
                     return jsonify({"error": "Fund not found"}), 404
 
-                return render_template('update_fund_form.html', fund=fund_to_update, action= "update")
-            except Exception as e:
-                return jsonify({"error": str(e)}), 500
-        
-        @self.app.route('/delete/<fund_id>', methods=['GET'])
-        def render_delete_page(fund_id):
-            try:
-                # Fetch fund information from the database
-                equity_funds = self.equity_manager.get_all_funds()
-                fund_to_update = next((fund for fund in equity_funds if fund["fund_id"] == fund_id), None)
-
-                if not fund_to_update:
-                    return jsonify({"error": "Fund not found"}), 404
-
-                return render_template('update_fund_form.html', fund=fund_to_update, action="delete")
+                return render_template('update_fund_form.html', fund=fund_to_update)
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
 
         @self.app.route('/funds/<fund_id>', methods=['POST'])
         def put_fund(fund_id):
             """
-            Endpoint to update or delete a fund's information using form submission.
+            Endpoint to update a fund's information using form submission.
             """
             try:
-                # Get the action (update or delete) from the form data
-                action = request.form.get('action')
+                # Parse the form data
+                fund_data = request.form.to_dict()
 
-                if action == "update":
-                    # Parse the form data for updating
-                    fund_data = request.form.to_dict()
-
-                    # Validate and process numeric fields
-                    fund_data['nav'] = float(fund_data.get('nav', 0))
-                    fund_data['performance'] = float(fund_data.get('performance', 0))
-
-                    # Update the fund using the manager
-                    result = self.equity_manager.update_fund(fund_id, fund_data)
-
-                    if "error" in result:
-                        return jsonify({"error": result["error"]}), 400
-
-                    # Return success message
-                    return """
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Success</title>
-                    </head>
-                    <body>
-                        <h1>Fund updated successfully.</h1>
-                        <a href="/funds">Back to Funds List</a>
-                    </body>
-                    </html>
-                    """
-
-                elif action == "delete":
-                    # Handle delete functionality
-                    fund_data = request.form.to_dict()
-                    result = self.equity_manager.delete_funds(fund_id)
-
-                    if "error" in result:
-                        return jsonify({"error": result["error"]}), 400
-
-                    # Return success message
-                    return """
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Success</title>
-                    </head>
-                    <body>
-                        <h1>Fund deleted successfully.</h1>
-                        <a href="/funds">Back to Funds List</a>
-                    </body>
-                    </html>
-                    """
-
-                else:
-                    # Invalid action
-                    return jsonify({"error": "Invalid action"}), 400
-
+                # Validate and process numeric fields
+                fund_data['nav'] = float(fund_data.get('nav', 0))
+                fund_data['performance'] = float(fund_data.get('performance', 0))
+                
+                # Update the fund using the manager
+                result = self.equity_manager.update_fund(fund_id, fund_data)
+                
+                if "error" in result:
+                    return jsonify({"error": result["error"]}), 400
+                
+                return """
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Success</title>
+                </head>
+                <body>
+                    <h1>Upadate fund successfully.</h1>
+                    <a href="/funds">Back to Funds List</a>
+                </body>
+                </html>
+                """
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
 
@@ -191,6 +143,9 @@ class FundAPI:
                 return redirect('/funds')
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
+
+
+
 
 
         #Home page

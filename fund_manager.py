@@ -49,6 +49,8 @@ class FundManager:
         except Exception as e:
             return {"error": str(e)}
 
+
+
     def create_fund(self, fund_data):
         required_fields = ["fund_id", "name", "manager_name", "description", "nav", "creation_date", "performance"]
         
@@ -81,21 +83,19 @@ class FundManager:
             return {"error": str(e)}
 
     def get_all_funds(self):
-        try:
-            query = "SELECT * FROM funds"
-            with self.db.connect() as conn:
-                cursor = conn.cursor()
-                cursor.execute(query)
-
-                # Dynamically map column names to rows
-                column_names = [description[0] for description in cursor.description]
-                rows = cursor.fetchall()
-
-                # Map rows into a list of dictionaries
-                funds = [dict(zip(column_names, row)) for row in rows]
-            return {"status": "success", "data": funds}
-        except Exception as e:
-            return {"error": str(e)}
+        query = "SELECT * FROM funds"
+        with self.db.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            
+            # Dynamically map column names to rows
+            column_names = [description[0] for description in cursor.description]  # Get column names dynamically
+            rows = cursor.fetchall()
+            
+            # Map rows into a list of dictionaries
+            funds = [dict(zip(column_names, row)) for row in rows]
+            
+            return funds
 
     def delete_funds(self, fund_id):
         try:
@@ -105,11 +105,13 @@ class FundManager:
                 conn.commit()
                 if cursor.rowcount == 0:
                     return {"error": "No fund with the given ID"}
-                return {"status": "success", "message": "Fund successfully deleted"}
+                return {"message": "Fund successfully deleted."}
         except Exception as e:
             return {"error": str(e)}
 
 
+            
+        
 class EquityFundManager(FundManager):
     def __init__(self, db_handler):
         super().__init__(db_handler)
