@@ -1,5 +1,6 @@
 from DatabaseConnection import DatabaseHandler
 
+
 class FundManager:
     def __init__(self, db_handler):
         self.db = db_handler
@@ -40,57 +41,61 @@ class FundManager:
                     fund_id,
                 ))
                 conn.commit()
+                
+                # Check if the update impacted any rows
                 if cursor.rowcount == 0:
                     return {"error": "No fund with given ID"}
-                return {"message": "Fund successfully updated."}
+                return {"status": "success", "message": "Fund successfully updated."}
         except Exception as e:
             return {"error": str(e)}
-
-
 
     def create_fund(self, fund_data):
         required_fields = ["fund_id", "name", "manager_name", "description", "nav", "creation_date", "performance"]
         
-        # Validate input data
+        # Validate required fields
         for field in required_fields:
             if field not in fund_data:
-                raise ValueError(f"Missing required field: {field}")
-        
-        # Prepare the SQL query
-        query = """
-        INSERT INTO funds (fund_id, name, manager_name, description, nav, creation_date, performance)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """
-        values = (
-            fund_data["fund_id"],
-            fund_data["name"],
-            fund_data["manager_name"],
-            fund_data["description"],
-            fund_data["nav"],
-            fund_data["creation_date"],
-            fund_data["performance"],
-        )
-        
-        # Execute the query
-        with self.db.connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, values)
-            conn.commit()
+                return {"error": f"Missing required field: {field}"}
+
+        # Prepare and execute query
+        try:
+            query = """
+            INSERT INTO funds (fund_id, name, manager_name, description, nav, creation_date, performance)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """
+            values = (
+                fund_data["fund_id"],
+                fund_data["name"],
+                fund_data["manager_name"],
+                fund_data["description"],
+                fund_data["nav"],
+                fund_data["creation_date"],
+                fund_data["performance"],
+            )
+            with self.db.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, values)
+                conn.commit()
+            return {"status": "success", "message": "Fund successfully created."}
+        except Exception as e:
+            return {"error": str(e)}
 
     def get_all_funds(self):
-        query = "SELECT * FROM funds"
-        with self.db.connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query)
-            
-            # Dynamically map column names to rows
-            column_names = [description[0] for description in cursor.description]  # Get column names dynamically
-            rows = cursor.fetchall()
-            
-            # Map rows into a list of dictionaries
-            funds = [dict(zip(column_names, row)) for row in rows]
-            
-            return funds
+        try:
+            query = "SELECT * FROM funds"
+            with self.db.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query)
+
+                # Dynamically map column names to rows
+                column_names = [description[0] for description in cursor.description]
+                rows = cursor.fetchall()
+
+                # Map rows into a list of dictionaries
+                funds = [dict(zip(column_names, row)) for row in rows]
+            return {"status": "success", "data": funds}
+        except Exception as e:
+            return {"error": str(e)}
 
     def delete_funds(self, fund_id):
         try:
@@ -100,13 +105,11 @@ class FundManager:
                 conn.commit()
                 if cursor.rowcount == 0:
                     return {"error": "No fund with the given ID"}
-                return {"message": "Fund successfully deleted."}
+                return {"status": "success", "message": "Fund successfully deleted"}
         except Exception as e:
             return {"error": str(e)}
 
 
-            
-        
 class EquityFundManager(FundManager):
     def __init__(self, db_handler):
         super().__init__(db_handler)

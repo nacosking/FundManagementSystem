@@ -193,9 +193,6 @@ class FundAPI:
                 return jsonify({"error": str(e)}), 500
 
 
-
-
-
         #Home page
         @self.app.route('/')
         def HomaPage():
