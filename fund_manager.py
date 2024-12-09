@@ -48,7 +48,7 @@ class FundManager:
 
 
 
-    def create_fund(self, fund_data, funds_id):
+    def create_fund(self, fund_data):
         required_fields = ["fund_id", "name", "manager_name", "description", "nav", "creation_date", "performance"]
         
         # Validate input data
@@ -92,6 +92,21 @@ class FundManager:
             
             return funds
 
+    def delete_funds(self, fund_id):
+        try:
+            with self.db.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM funds WHERE fund_id = ?", (fund_id,))
+                conn.commit()
+                if cursor.rowcount == 0:
+                    return {"error": "No fund with the given ID"}
+                return {"message": "Fund successfully deleted."}
+        except Exception as e:
+            return {"error": str(e)}
+
+
+            
+        
 class EquityFundManager(FundManager):
     def __init__(self, db_handler):
         super().__init__(db_handler)
