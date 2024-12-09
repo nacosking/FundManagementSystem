@@ -1,0 +1,136 @@
+1. API Overview
+Base URL
+http://127.0.0.1:5000/
+Supported Endpoints
+
+HTTP method	Endpoint	Description
+GET	/	Home page of the API
+GET	/funds	Retrieve all equity funds
+POST	/fund	Create a new equity fund
+GET	/addfunds	Render the form to create a new fund
+GET	/updatefunds/<id>	Render the form to update an existing fund
+POST	/funds/<id>	Update an existing fund by ID
+
+
+
+2. SQL Schema
+The SQL database uses a single table named funds.
+Schema Definition:
+ 
+
+Field	Type	Description
+fund_id	TEXT	Unique identifier for the fund (Primary Key).
+name	TEXT	Name of the equity fund.
+manager_name	TEXT	Name of the fund manager.
+description	TEXT	Brief description of the fund.
+nav	REAL	Net Asset Value (NAV) of the fund.
+creation_date	TEXT	Fund creation date (YYYY-MM-DD).
+performance	REAL	Performance of the fund in percentage.Z`
+
+
+3. Endpoint Details
+3.1. GET /
+Description:
+Returns the homepage.
+Sample Response:
+ 
+
+3.2. GET /funds
+Description:
+Retrieve a list of all funds. Supports an optional search query parameter (?search=<query>).
+Query Parameters:
+•	search (optional): Search for funds by name or ID.
+Sample Request:
+GET /funds?search=Equity HTTP/1.1
+
+Sample Response:
+
+[
+    {
+        "fund_id": "126",
+        "name": "Equity Fund A",
+        "manager_name": "John Doe",
+        "description": "High growth equity fund.",
+        "nav": 150.0,
+        "creation_date": "2023-12-01",
+        "performance": 4.5
+    },
+    {
+        "fund_id": "127",
+        "name": "Equity Fund B",
+        "manager_name": "Jane Smith",
+        "description": "Stable equity fund.",
+        "nav": 120.0,
+        "creation_date": "2023-11-15",
+        "performance": 3.2
+    }
+]
+
+3.3. POST /funds
+Description:
+Create a new equity fund.
+Payload Format: Content-Type: application/json or application/x-www-form-urlencoded.
+Required Fields:
+•	fund_id
+•	name
+•	manager_name
+•	description
+•	nav
+•	creation_date
+•	performance
+
+Sample Request:
+
+curl -X POST http://127.0.0.1:5000/funds 
+-H "Content-Type: application/json" 
+-d '{"fund_id": "126", "name": "Equity Fund C", "manager_name": "Jane Doe", "description": "Equity Fund", "nav": 150.0, "creation_date": "2023-12-01", "performance": 4.0}'
+
+Sample Response:
+{
+  "message": "Equity fund created successfully."
+}
+
+3.4. GET /addfunds
+Description:
+Render the form to create a new fund.
+Sample Response:
+HTML form for input.
+
+3.5. GET /update/<fund_id>
+Description:
+Render the update form for an existing fund.
+Path Parameters:
+•	fund_id (required): ID of the fund to be updated.
+Sample Response:
+HTML form pre-filled with the fund’s existing details.
+3.6. POST /funds/<fund_id>
+Description:
+Update an existing fund by its ID.
+Path Parameters:
+•	fund_id (required): ID of the fund to update.
+Payload Format:
+Content-Type: application/json or application/x-www-form-urlencoded.
+Required Fields:
+•	name
+•	manager_name
+•	description
+•	nav
+•	creation_date
+•	performance
+
+4. Error Handling
+The API provides meaningful error messages for various scenarios.
+Error Response Format
+json
+{ "error": "<error_message>" }
+
+Common Errors: 
+Scenario	Status Code	Error Message
+Missing required fields	422	"Missing required fields: name"
+Invalid field type/format	422	"Invalid input: NAV must be a number"
+Non-existent fund (GET/POST)	404	"Fund not found"
+Unexpected internal error	500	An unexpected error occurred: ..."
+
+5. Sample Database
+Here is an example of how the database might look after populating:
+ 
